@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
+  HttpErrorResponse,
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
@@ -19,8 +20,19 @@ export class ErrorPrintInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<unknown>> {
     return next.handle(request).pipe(
       tap({
-        error: () => {
+        // eslint-disable-next-line rxjs/no-implicit-any-catch
+        error: (e: any) => {
           const url = new URL(request.url);
+          if (e?.status === 401) {
+            alert(
+              `Authorization error has been occured: ${e.status}. Unauthorized. Reason: no data for authorization was provided`
+            );
+          }
+          if (e?.status === 403) {
+            alert(
+              `Identification error has been occured. ${e.status}. Forbidden. Reason: wrong credentials was provided`
+            );
+          }
 
           this.notificationService.showError(
             `Request to "${url.pathname}" failed. Check the console for the details`,

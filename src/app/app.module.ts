@@ -25,6 +25,10 @@ const interceptors: Provider[] = [
     useClass: ErrorPrintInterceptor,
     multi: true,
   },
+  {
+    provide: 'Window',
+    useValue: window,
+  },
 ];
 
 @NgModule({
