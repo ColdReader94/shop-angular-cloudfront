@@ -1,11 +1,14 @@
-import { Injectable, Injector } from '@angular/core';
+import { Inject, Injectable, Injector } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { switchMap } from 'rxjs/operators';
 
 @Injectable()
 export class ManageProductsService extends ApiService {
-  constructor(injector: Injector) {
+  constructor(
+    public injector: Injector,
+    @Inject('Window') private window: Window
+  ) {
     super(injector);
   }
 
@@ -31,11 +34,16 @@ export class ManageProductsService extends ApiService {
 
   private getPreSignedUrl(fileName: string): Observable<string> {
     const url = this.getUrl('import', 'import');
-
+    const token = this.window.localStorage.getItem('authorization_token');
+    let authHeader;
+    if (token) {
+      authHeader = { authorization: `Basic ${btoa(token)}` };
+    }
     return this.http.get<string>(url, {
       params: {
         name: fileName,
       },
+      headers: authHeader,
     });
   }
 }
